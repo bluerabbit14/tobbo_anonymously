@@ -64,33 +64,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       Image.asset(
                         'assets/images/tobbo.png',
-                        height: 28,
-                        width: 28,
+                        height: 50,
+                        width: 50,
                         filterQuality: FilterQuality.high,
                       ),
-                      const SizedBox(width: 10),
                       Text(
                         'Tobbo'.toUpperCase(),
                         style: GoogleFonts.spaceGrotesk(
                           color: cream,
-                          fontSize: 18,
+                          fontSize: 22,
                           letterSpacing: 2,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
-                  const Spacer(),
+                  const SizedBox(height: 100),
                   Text(
                     'Ask anything.\nGet honest answers.',
                     style: GoogleFonts.spaceGrotesk(
                       color: cream,
-                      fontSize: 42,
+                      fontSize: 46,
                       height: 1.08,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.xl),
                   Text(
                     'Get real opinions from real people — without revealing who you are.',
                     style: GoogleFonts.inter(
@@ -124,7 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ],
                   SizedBox(
                     width: double.infinity,
-                    height: 52,
+                    height: 50,
                     child: FilledButton(
                       onPressed: _starting ? null : _getStarted,
                       style: FilledButton.styleFrom(
@@ -134,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       child: Text(
                         'Get Started',
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15),
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 18),
                       ),
                     ),
                   ),
@@ -145,6 +144,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       style: GoogleFonts.inter(color: cream.withValues(alpha: 0.7), fontSize: 13),
                     ),
                   ),
+                  const SizedBox(height: 40)
                 ],
               ),
             ),

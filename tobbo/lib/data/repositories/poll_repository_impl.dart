@@ -21,6 +21,14 @@ class PollRepositoryImpl extends ChangeNotifier implements PollRepository {
   final LocationService _location;
   final SessionRepository _sessions;
 
+  Future<List<Poll>>? _nearbyFuture;
+  double? _nearbyRadiusKm;
+
+  void invalidateNearbyCache() {
+    _nearbyFuture = null;
+    _nearbyRadiusKm = null;
+  }
+
   @override
   Future<Poll> createPoll({
     required String question,
@@ -62,10 +70,33 @@ class PollRepositoryImpl extends ChangeNotifier implements PollRepository {
   }
 
   @override
-  Future<List<Poll>> getNearbyPolls({required double radiusKm}) async {
+  Future<List<Poll>> getNearbyPolls({required double radiusKm}) {
+    if (_nearbyFuture != null && _nearbyRadiusKm == radiusKm) {
+      return _nearbyFuture!;
+    }
+    final future = _loadNearby(radiusKm: radiusKm);
+    _nearbyFuture = future;
+    _nearbyRadiusKm = radiusKm;
+    future.then<void>(
+      (_) {},
+      onError: (_) {
+        if (identical(_nearbyFuture, future)) {
+          invalidateNearbyCache();
+        }
+      },
+    );
+    return future;
+  }
+
+  Future<List<Poll>> _loadNearby({required double radiusKm}) async {
     await _sessions.ensureSession();
     final point = await _location.getCurrentPosition();
-    if (point == null) return const [];
+    if (point == null) {
+      if (_nearbyRadiusKm == radiusKm) {
+        invalidateNearbyCache();
+      }
+      return const [];
+    }
     final items = await _api.getNearbyPolls(
       latitude: point.latitude,
       longitude: point.longitude,
@@ -145,6 +176,7 @@ class PollRepositoryImpl extends ChangeNotifier implements PollRepository {
 
   @override
   Future<void> clearLocalData() async {
+    invalidateNearbyCache();
     await _sessions.clearSession();
     notifyListeners();
   }

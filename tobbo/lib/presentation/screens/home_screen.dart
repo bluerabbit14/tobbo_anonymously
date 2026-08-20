@@ -8,7 +8,6 @@ import 'package:Tobbo/domain/entities/poll.dart';
 import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/empty_state.dart';
 import 'package:Tobbo/presentation/widgets/poll_card.dart';
-import 'package:Tobbo/presentation/widgets/tobbo_button.dart';
 import 'package:Tobbo/presentation/widgets/tobbo_loader.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,11 +18,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Future<List<Poll>>? _nearbyFuture;
+  bool? _nearbyEnabled;
+  double? _radiusKm;
+
   String _greeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) return 'Good morning.';
     if (hour < 17) return 'Good afternoon.';
     return 'Good evening.';
+  }
+
+  Future<List<Poll>> _nearbyPolls({required bool enabled, required double radiusKm}) {
+    if (_nearbyFuture != null && _nearbyEnabled == enabled && _radiusKm == radiusKm) {
+      return _nearbyFuture!;
+    }
+    _nearbyEnabled = enabled;
+    _radiusKm = radiusKm;
+    _nearbyFuture = enabled
+        ? context.pollStore.getNearbyPolls(radiusKm: radiusKm)
+        : Future<List<Poll>>.value(const []);
+    return _nearbyFuture!;
   }
 
   @override
@@ -33,11 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
       animation: context.repos.listenable,
       builder: (context, _) {
         final settings = context.settingsStore.current;
-        final future = settings.nearbyEnabled
-            ? context.pollStore.getNearbyPolls(radiusKm: settings.radiusKm)
-            : Future<List<Poll>>.value(const []);
         return FutureBuilder(
-          future: future,
+          future: _nearbyPolls(
+            enabled: settings.nearbyEnabled,
+            radiusKm: settings.radiusKm,
+          ),
           builder: (context, snapshot) {
             final items = snapshot.data ?? [];
             return Scaffold(
@@ -52,14 +67,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Row(
                       children: [
-                        Text('Tobbo', style: Theme.of(context).textTheme.titleLarge),
+                        Row(
+                          children: [
+                            Image.asset(
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? 'assets/images/tobbo.png'
+                                  : 'assets/images/tobbo_black.png',
+                              width: 40,
+                              height: 40,
+                              filterQuality: FilterQuality.high,
+                            ),
+                            Text('Tobbo'.toUpperCase(), style: Theme.of(context).textTheme.titleLarge),
+                          ],
+                        ),
                         const Spacer(),
                         Icon(LucideIcons.map_pin, size: 16, color: palette.mutedText),
                         const SizedBox(width: 6),
                         Text('Near you', style: Theme.of(context).textTheme.bodySmall),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.xxl),
+                    const SizedBox(height: AppSpacing.lg),
                     Text(_greeting(), style: Theme.of(context).textTheme.bodyLarge),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
@@ -67,22 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        onPressed: () => context.push(AppRoutes.ask),
-                        child: Text(
-                          'Ask Tobbo',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: palette.primary),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    RadiusChips(
-                      value: settings.radiusKm,
-                      onChanged: context.settingsStore.setRadiusKm,
-                    ),
-                    const SizedBox(height: AppSpacing.xxl),
                     Row(
                       children: [
                         Text('Nearby questions', style: Theme.of(context).textTheme.titleSmall),
@@ -104,7 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "Couldn't load nearby questions.",
                         message: snapshot.error.toString(),
                         actionLabel: 'Try again',
-                        onAction: () => setState(() {}),
+                        onAction: () => setState(() {
+                          context.pollStore.invalidateNearbyCache();
+                          _nearbyFuture = null;
+                        }),
                       )
                     else if (items.isEmpty)
                       EmptyState(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Tobbo/core/constants/app_limits.dart';
 import 'package:Tobbo/core/constants/app_radii.dart';
@@ -120,7 +121,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                                 _options.removeAt(i).dispose();
                               });
                             },
-                            icon: const Icon(Icons.close, size: 18),
+                            icon: Icon(LucideIcons.x, size: 18, color: palette.mutedText),
                           )
                         : null,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadii.input)),

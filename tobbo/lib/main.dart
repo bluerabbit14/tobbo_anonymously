@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Tobbo/core/router/app_router.dart';
@@ -24,7 +27,11 @@ Future<void> main() async {
     location: LocationService(),
     sessions: sessions,
   );
-  final settings = SettingsRepositoryImpl();
+  final settings = SettingsRepositoryImpl(prefs: prefs);
+  unawaited(sessions.ensureSession());
+  if (sessions.hasStoredIdentity && settings.current.nearbyEnabled) {
+    unawaited(polls.getNearbyPolls(radiusKm: settings.current.radiusKm));
+  }
   runApp(
     RepositoryScope(
       polls: polls,
@@ -60,6 +67,12 @@ class TobboApp extends StatelessWidget {
           darkTheme: buildDarkTheme(),
           themeMode: settings.current.themeMode,
           routerConfig: router,
+          builder: (context, child) {
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: tobboOverlayStyle(Theme.of(context).brightness),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
         );
       },
     );

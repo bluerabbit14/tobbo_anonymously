@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 class GeoPoint {
@@ -33,10 +34,7 @@ class LocationService {
 
     try {
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 15),
-        ),
+        locationSettings: _settings(),
       );
       _cached = GeoPoint(position.latitude, position.longitude);
       _cachedAt = DateTime.now();
@@ -56,5 +54,22 @@ class LocationService {
       return null;
     }
     return getCurrentPosition(requestIfNeeded: false);
+  }
+
+  /// Coarse location is enough for 1–10 km nearby. Avoid Google Fused Location
+  /// so Android does not keep prompting to turn on Location Accuracy.
+  LocationSettings _settings() {
+    const timeLimit = Duration(seconds: 15);
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return AndroidSettings(
+        accuracy: LocationAccuracy.low,
+        timeLimit: timeLimit,
+        forceLocationManager: true,
+      );
+    }
+    return const LocationSettings(
+      accuracy: LocationAccuracy.low,
+      timeLimit: timeLimit,
+    );
   }
 }

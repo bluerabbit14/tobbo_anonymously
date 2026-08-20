@@ -138,12 +138,14 @@ class NearbyPollItemResponse {
     required this.question,
     required this.voteCount,
     required this.distanceKm,
+    required this.createdAt,
   });
 
   final String publicCode;
   final String question;
   final int voteCount;
   final double distanceKm;
+  final DateTime createdAt;
 
   factory NearbyPollItemResponse.fromJson(Map<String, dynamic> json) {
     return NearbyPollItemResponse(
@@ -151,6 +153,7 @@ class NearbyPollItemResponse {
       question: json['question'] as String,
       voteCount: (json['voteCount'] as num?)?.toInt() ?? 0,
       distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0,
+      createdAt: DateTime.parse(json['createdAt'] as String).toUtc(),
     );
   }
 
@@ -162,7 +165,7 @@ class NearbyPollItemResponse {
       options: const [],
       voteCount: voteCount,
       distanceKm: distanceKm,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      createdAt: createdAt,
       createdByUserId: '',
     );
   }

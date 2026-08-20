@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:Tobbo/core/constants/app_spacing.dart';
 import 'package:Tobbo/core/theme/tobbo_palette.dart';
 import 'package:Tobbo/presentation/widgets/tobbo_button.dart';
@@ -54,8 +55,7 @@ class ScreenHeader extends StatelessWidget {
         if (onBack != null)
           IconButton(
             onPressed: onBack,
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-            color: context.palette.primaryText,
+            icon: Icon(LucideIcons.arrow_left, size: 20, color: context.palette.primaryText),
           ),
         Expanded(child: Text(title, style: Theme.of(context).textTheme.headlineMedium)),
       ],

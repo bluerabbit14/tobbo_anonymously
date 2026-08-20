@@ -58,6 +58,7 @@ class ActivityScreen extends StatelessWidget {
                       ),
                       TabBar(
                         labelColor: context.palette.primaryText,
+                        unselectedLabelColor: context.palette.mutedText,
                         indicatorColor: context.palette.primary,
                         tabs: const [
                           Tab(text: 'Asked'),

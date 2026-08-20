@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:Tobbo/core/constants/app_colors.dart';
 import 'package:Tobbo/core/constants/app_radii.dart';
 import 'package:Tobbo/core/constants/app_spacing.dart';
 import 'package:Tobbo/core/router/app_routes.dart';
@@ -20,19 +21,12 @@ class AppShell extends StatelessWidget {
     final palette = context.palette;
     return Scaffold(
       body: navigationShell,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(AppRoutes.ask),
-        backgroundColor: palette.primary,
-        foregroundColor: palette.surface,
-        elevation: 0,
-        shape: const CircleBorder(),
-        child: const Icon(LucideIcons.plus),
-      ),
+      floatingActionButton: _AskFab(onPressed: () => context.push(AppRoutes.ask)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         color: palette.surface,
         elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.huge),
         height: 68,
         child: Row(
           children: [
@@ -43,14 +37,6 @@ class AppShell extends StatelessWidget {
               onTap: () => _onTap(0),
             ),
             const Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(top: 22),
-              child: Text(
-                'Ask',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: palette.mutedText),
-              ),
-            ),
-            const Spacer(),
             _NavItem(
               icon: LucideIcons.settings,
               label: 'Settings',
@@ -58,6 +44,45 @@ class AppShell extends StatelessWidget {
               onTap: () => _onTap(1),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AskFab extends StatelessWidget {
+  const _AskFab({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  static const double _size = 72;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return SizedBox(
+      width: _size,
+      height: _size,
+      child: Material(
+        color: Colors.transparent,
+        elevation: 6,
+        shadowColor: palette.deepBrand.withValues(alpha: 0.4),
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          child: Ink(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.deepBrand, AppColors.accent],
+              ),
+            ),
+            child: const Icon(LucideIcons.plus, size: 32, color: AppColors.lightSurface),
+          ),
         ),
       ),
     );

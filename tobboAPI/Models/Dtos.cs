@@ -42,7 +42,8 @@ public sealed record NearbyPollItemResponse(
     string PublicCode,
     string Question,
     int VoteCount,
-    double DistanceKm);
+    double DistanceKm,
+    DateTime CreatedAt);
 
 public sealed record NearbyPollsResponse(IReadOnlyList<NearbyPollItemResponse> Items);
 

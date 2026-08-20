@@ -1,7 +1,7 @@
 name: Tobbo
 description: "Ask anything. Get honest answers."
 publish_to: 'none'
-version: 1.0.1+2
+version: 1.0.3+4
 
 environment:
   sdk: ^3.12.0
@@ -49,17 +49,23 @@ flutter_launcher_icons:
     generate: false
 
 flutter_native_splash:
-  color: "#033e42"
+  background_image: assets/images/tobbo_splash_background.jpg
+  background_image_dark: assets/images/tobbo_splash_background.jpg
   image: assets/images/tobbo_splash.png
-  color_dark: "#033e42"
   image_dark: assets/images/tobbo_splash.png
+  branding: assets/images/tobbo_branding.png
+  branding_dark: assets/images/tobbo_branding.png
+  branding_mode: bottom
+  branding_bottom_padding: 24
   android_12:
     color: "#033e42"
     image: assets/images/tobbo_splash.png
     icon_background_color: "#033e42"
+    branding: assets/images/tobbo_branding.png
     color_dark: "#033e42"
     image_dark: assets/images/tobbo_splash.png
     icon_background_color_dark: "#033e42"
+    branding_dark: assets/images/tobbo_branding.png
   android: true
   ios: true
   web: false

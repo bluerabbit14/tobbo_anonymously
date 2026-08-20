@@ -26,7 +26,7 @@ class TobboLoadingOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: ColoredBox(
-        color: Colors.black.withValues(alpha: 0.16),
+        color: context.palette.primaryText.withValues(alpha: 0.24),
         child: Center(child: TobboLoader(color: color, size: 48)),
       ),
     );

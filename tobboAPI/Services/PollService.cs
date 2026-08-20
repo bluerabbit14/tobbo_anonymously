@@ -188,6 +188,7 @@ public sealed class PollService
                 p.Question,
                 p.Latitude,
                 p.Longitude,
+                p.CreatedAt,
                 VoteCount = p.Votes.Count
             })
             .ToListAsync(cancellationToken);
@@ -198,6 +199,7 @@ public sealed class PollService
                 p.PublicCode,
                 p.Question,
                 p.VoteCount,
+                p.CreatedAt,
                 DistanceKm = GeoDistance.HaversineKm(
                     latitude,
                     longitude,
@@ -205,12 +207,14 @@ public sealed class PollService
                     (double)p.Longitude!)
             })
             .Where(p => p.DistanceKm <= radiusKm)
-            .OrderBy(p => p.DistanceKm)
+            .OrderByDescending(p => p.CreatedAt)
+            .ThenBy(p => p.DistanceKm)
             .Select(p => new NearbyPollItemResponse(
                 p.PublicCode,
                 p.Question,
                 p.VoteCount,
-                GeoDistance.RoundKm(p.DistanceKm)))
+                GeoDistance.RoundKm(p.DistanceKm),
+                p.CreatedAt))
             .ToList();
 
         return new NearbyPollsResponse(items);

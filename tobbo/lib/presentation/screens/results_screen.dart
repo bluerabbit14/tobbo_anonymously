@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:Tobbo/core/constants/app_spacing.dart';
 import 'package:Tobbo/core/router/app_routes.dart';
+import 'package:Tobbo/core/theme/tobbo_palette.dart';
 import 'package:Tobbo/domain/entities/poll.dart';
 import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/empty_state.dart';
@@ -22,11 +24,13 @@ class ResultsScreen extends StatefulWidget {
 
 class _ResultsScreenState extends State<ResultsScreen> {
 
-  String _shareUrl(Poll poll) => 'https://tobbo.app/p/${poll.publicCode}';
+  String _shareUrl(Poll poll) => 'https://tobboweb.vercel.app/p/${poll.publicCode}';
 
   Future<void> _share(BuildContext context, Poll poll) async {
+    final palette = context.palette;
     await showModalBottomSheet<void>(
       context: context,
+      backgroundColor: palette.surface,
       showDragHandle: true,
       builder: (sheetContext) {
         return Padding(
@@ -37,18 +41,28 @@ class _ResultsScreenState extends State<ResultsScreen> {
             children: [
               Text('Share this question', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
-              Text(_shareUrl(poll), style: Theme.of(context).textTheme.bodyMedium),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(_shareUrl(poll), style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  IconButton(
+                    icon: Icon(LucideIcons.copy, color: palette.primaryText),
+                    tooltip: 'Copy link',
+                    onPressed: () async {
+                      await Clipboard.setData(ClipboardData(text: _shareUrl(poll)));
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Link copied')),
+                      );
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Copy link'),
-                onTap: () async {
-                  await Clipboard.setData(ClipboardData(text: _shareUrl(poll)));
-                  if (sheetContext.mounted) Navigator.pop(sheetContext);
-                },
-              ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
+                leading: Icon(LucideIcons.share, color: palette.mutedText),
                 title: const Text('More'),
                 onTap: () {
                   Navigator.pop(sheetContext);

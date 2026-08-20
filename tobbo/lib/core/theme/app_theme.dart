@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:Tobbo/core/constants/app_colors.dart';
+import 'package:Tobbo/core/constants/app_radii.dart';
 
 TextTheme buildTobboTextTheme({
   required Color primary,
@@ -33,6 +35,18 @@ TextTheme buildTobboTextTheme({
   );
 }
 
+SystemUiOverlayStyle tobboOverlayStyle(Brightness brightness) {
+  final isDark = brightness == Brightness.dark;
+  return SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+    statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+    systemNavigationBarColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+    systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+    systemNavigationBarDividerColor: Colors.transparent,
+  );
+}
+
 ThemeData buildLightTheme() {
   final textTheme = buildTobboTextTheme(
     primary: AppColors.lightPrimaryText,
@@ -56,15 +70,79 @@ ThemeData buildLightTheme() {
       outline: AppColors.lightBorder,
     ),
     textTheme: textTheme,
+    iconTheme: const IconThemeData(color: AppColors.lightPrimaryText, size: 22),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(foregroundColor: AppColors.lightPrimaryText),
+    ),
     appBarTheme: AppBarTheme(
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: AppColors.lightBackground,
       foregroundColor: AppColors.lightPrimaryText,
       titleTextStyle: textTheme.titleMedium,
+      systemOverlayStyle: tobboOverlayStyle(Brightness.light),
     ),
     dividerColor: AppColors.lightBorder,
     cardColor: AppColors.lightSurface,
+    cardTheme: CardThemeData(
+      color: AppColors.lightSurface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 2,
+      shadowColor: AppColors.deepBrand.withValues(alpha: 0.10),
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadii.card),
+        side: const BorderSide(color: AppColors.lightBorder),
+      ),
+    ),
+    inputDecorationTheme: _inputTheme(
+      fill: AppColors.lightSurface,
+      border: AppColors.lightBorder,
+      focused: AppColors.primary,
+      hint: AppColors.lightMutedText,
+      icon: AppColors.lightMutedText,
+      textTheme: textTheme,
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: AppColors.lightSurface,
+      surfaceTintColor: Colors.transparent,
+      dragHandleColor: AppColors.lightBorder,
+      showDragHandle: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.large)),
+        side: BorderSide(color: AppColors.lightBorder),
+      ),
+    ),
+    listTileTheme: const ListTileThemeData(
+      iconColor: AppColors.lightMutedText,
+      textColor: AppColors.lightPrimaryText,
+    ),
+    tabBarTheme: const TabBarThemeData(
+      labelColor: AppColors.lightPrimaryText,
+      unselectedLabelColor: AppColors.lightMutedText,
+      indicatorColor: AppColors.primary,
+      dividerColor: AppColors.lightBorder,
+    ),
+    bottomAppBarTheme: const BottomAppBarThemeData(
+      color: AppColors.lightSurface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+    ),
+    sliderTheme: SliderThemeData(
+      trackHeight: 4,
+      activeTrackColor: AppColors.primary,
+      inactiveTrackColor: AppColors.lightBorder,
+      thumbColor: AppColors.primary,
+      overlayColor: AppColors.primary.withValues(alpha: 0.12),
+      valueIndicatorColor: AppColors.deepBrand,
+      valueIndicatorTextStyle: textTheme.labelLarge?.copyWith(color: AppColors.lightSurface),
+    ),
+    switchTheme: _switchTheme(
+      selectedTrack: AppColors.primary,
+      unselectedTrack: AppColors.lightBorder,
+      selectedThumb: AppColors.lightSurface,
+      unselectedThumb: AppColors.lightMutedText,
+    ),
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       backgroundColor: AppColors.deepBrand,
@@ -96,19 +174,126 @@ ThemeData buildDarkTheme() {
       outline: AppColors.darkBorder,
     ),
     textTheme: textTheme,
+    iconTheme: const IconThemeData(color: AppColors.darkPrimaryText, size: 22),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(foregroundColor: AppColors.darkPrimaryText),
+    ),
     appBarTheme: AppBarTheme(
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: AppColors.darkBackground,
       foregroundColor: AppColors.darkPrimaryText,
       titleTextStyle: textTheme.titleMedium,
+      systemOverlayStyle: tobboOverlayStyle(Brightness.dark),
     ),
     dividerColor: AppColors.darkBorder,
     cardColor: AppColors.darkSurface,
+    cardTheme: CardThemeData(
+      color: AppColors.darkSurface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 2,
+      shadowColor: Colors.black.withValues(alpha: 0.45),
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadii.card),
+        side: const BorderSide(color: AppColors.darkBorder),
+      ),
+    ),
+    inputDecorationTheme: _inputTheme(
+      fill: AppColors.darkSurface,
+      border: AppColors.darkBorder,
+      focused: AppColors.accent,
+      hint: AppColors.darkMutedText,
+      icon: AppColors.darkMutedText,
+      textTheme: textTheme,
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: AppColors.darkSurface,
+      surfaceTintColor: Colors.transparent,
+      dragHandleColor: AppColors.darkBorder,
+      showDragHandle: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.large)),
+        side: BorderSide(color: AppColors.darkBorder),
+      ),
+    ),
+    listTileTheme: const ListTileThemeData(
+      iconColor: AppColors.darkMutedText,
+      textColor: AppColors.darkPrimaryText,
+    ),
+    tabBarTheme: const TabBarThemeData(
+      labelColor: AppColors.darkPrimaryText,
+      unselectedLabelColor: AppColors.darkMutedText,
+      indicatorColor: AppColors.accent,
+      dividerColor: AppColors.darkBorder,
+    ),
+    bottomAppBarTheme: const BottomAppBarThemeData(
+      color: AppColors.darkSurface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+    ),
+    sliderTheme: SliderThemeData(
+      trackHeight: 4,
+      activeTrackColor: AppColors.accent,
+      inactiveTrackColor: AppColors.darkBorder,
+      thumbColor: AppColors.accent,
+      overlayColor: AppColors.accent.withValues(alpha: 0.12),
+      valueIndicatorColor: AppColors.deepBrand,
+      valueIndicatorTextStyle: textTheme.labelLarge?.copyWith(color: AppColors.lightSurface),
+    ),
+    switchTheme: _switchTheme(
+      selectedTrack: AppColors.accent,
+      unselectedTrack: AppColors.darkBorder,
+      selectedThumb: AppColors.deepBrand,
+      unselectedThumb: AppColors.darkMutedText,
+    ),
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       backgroundColor: AppColors.darkSecondarySurface,
       contentTextStyle: textTheme.bodyMedium?.copyWith(color: AppColors.darkPrimaryText),
     ),
+  );
+}
+
+InputDecorationTheme _inputTheme({
+  required Color fill,
+  required Color border,
+  required Color focused,
+  required Color hint,
+  required Color icon,
+  required TextTheme textTheme,
+}) {
+  final radius = BorderRadius.circular(AppRadii.input);
+  return InputDecorationTheme(
+    filled: true,
+    fillColor: fill,
+    hintStyle: textTheme.bodyMedium?.copyWith(color: hint),
+    suffixIconColor: icon,
+    prefixIconColor: icon,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    border: OutlineInputBorder(borderRadius: radius, borderSide: BorderSide(color: border)),
+    enabledBorder: OutlineInputBorder(borderRadius: radius, borderSide: BorderSide(color: border)),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: radius,
+      borderSide: BorderSide(color: focused, width: 1.4),
+    ),
+  );
+}
+
+SwitchThemeData _switchTheme({
+  required Color selectedTrack,
+  required Color unselectedTrack,
+  required Color selectedThumb,
+  required Color unselectedThumb,
+}) {
+  return SwitchThemeData(
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    thumbColor: WidgetStateProperty.resolveWith((states) {
+      return states.contains(WidgetState.selected) ? selectedThumb : unselectedThumb;
+    }),
+    trackColor: WidgetStateProperty.resolveWith((states) {
+      return states.contains(WidgetState.selected) ? selectedTrack : unselectedTrack;
+    }),
+    trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
   );
 }

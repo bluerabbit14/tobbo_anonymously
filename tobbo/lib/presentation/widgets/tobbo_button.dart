@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:Tobbo/core/constants/app_radii.dart';
-import 'package:Tobbo/core/constants/app_spacing.dart';
 import 'package:Tobbo/core/theme/tobbo_palette.dart';
 
 class TobboButton extends StatelessWidget {
@@ -47,47 +46,6 @@ class TobboButton extends StatelessWidget {
         ),
         child: Text(label, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: palette.surface)),
       ),
-    );
-  }
-}
-
-class RadiusChips extends StatelessWidget {
-  const RadiusChips({
-    super.key,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final double value;
-  final ValueChanged<double> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    const options = [1.0, 5.0, 10.0];
-    final palette = context.palette;
-    return Row(
-      children: [
-        for (final option in options) ...[
-          GestureDetector(
-            onTap: () => onChanged(option),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-              decoration: BoxDecoration(
-                color: value == option ? palette.primary : palette.surface,
-                borderRadius: BorderRadius.circular(AppRadii.pill),
-                border: Border.all(color: value == option ? palette.primary : palette.border),
-              ),
-              child: Text(
-                '${option.round()} km',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: value == option ? palette.surface : palette.primaryText,
-                    ),
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.xs),
-        ],
-      ],
     );
   }
 }
