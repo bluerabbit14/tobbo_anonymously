@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "311844740186",
+    "project_id": "orbitra-cb8db",
+    "storage_bucket": "orbitra-cb8db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311844740186:android:f67792d10ab600ff240c63",
+        "android_client_info": {
+          "package_name": "com.example.tobbo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbzoPZPE8xcWFPxkKg_IaQ3ED_TM2BgqA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311844740186:android:5d44ae9ade468e8c240c63",
+        "android_client_info": {
+          "package_name": "com.kidga.orbitra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbzoPZPE8xcWFPxkKg_IaQ3ED_TM2BgqA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,58 @@
+@tobboAPI_HostAddress = http://localhost:5193
+@token = 
+@publicCode = 8F3K92
+@optionId = 00000000-0000-0000-0000-000000000000
+
+### Create anonymous identity
+POST {{tobboAPI_HostAddress}}/api/v1/anonymous
+Accept: application/json
+
+### Create poll
+POST {{tobboAPI_HostAddress}}/api/v1/polls
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "question": "Which phone should I buy?",
+  "options": [
+    "iPhone",
+    "Samsung",
+    "Pixel"
+  ],
+  "allowNearby": true,
+  "latitude": 28.61,
+  "longitude": 77.23
+}
+
+### Get poll
+GET {{tobboAPI_HostAddress}}/api/v1/polls/{{publicCode}}?latitude=28.61&longitude=77.23
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Vote
+POST {{tobboAPI_HostAddress}}/api/v1/polls/{{publicCode}}/votes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "optionId": "{{optionId}}"
+}
+
+### Results
+GET {{tobboAPI_HostAddress}}/api/v1/polls/{{publicCode}}/results
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Nearby polls
+GET {{tobboAPI_HostAddress}}/api/v1/polls/nearby?latitude=28.61&longitude=77.23&radiusKm=5
+Accept: application/json
+
+### My polls
+GET {{tobboAPI_HostAddress}}/api/v1/me/polls
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### My votes
+GET {{tobboAPI_HostAddress}}/api/v1/me/votes
+Authorization: Bearer {{token}}
+Accept: application/json
