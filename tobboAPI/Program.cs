@@ -35,14 +35,6 @@ builder.Services
     .AddScheme<AuthenticationSchemeOptions, AnonymousTokenHandler>(AnonymousTokenDefaults.Scheme, _ => { });
 builder.Services.AddAuthorization();
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
-
 builder.Services.ConfigureHttpJsonOptions(options => ConfigureJson(options.SerializerOptions));
 builder.Services.AddControllers()
     .AddJsonOptions(options => ConfigureJson(options.JsonSerializerOptions))
@@ -94,6 +86,23 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        ApplyOpenCors(context);
+        return Task.CompletedTask;
+    });
+
+    if (HttpMethods.IsOptions(context.Request.Method))
+    {
+        context.Response.StatusCode = StatusCodes.Status204NoContent;
+        return;
+    }
+
+    await next();
+});
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -108,7 +117,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-app.UseCors();
 app.UseAuthentication();
 app.Use(async (context, next) =>
 {
@@ -132,4 +140,28 @@ static void ConfigureJson(JsonSerializerOptions options)
 {
     options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+}
+
+static void ApplyOpenCors(HttpContext context)
+{
+    const string defaultAllowHeaders = "Accept, Authorization, Content-Type, Origin, X-Requested-With";
+    var origin = context.Request.Headers.Origin.ToString();
+    var allowOrigin = string.IsNullOrWhiteSpace(origin) ? "*" : origin;
+    var requestedHeaders = context.Request.Headers.AccessControlRequestHeaders.ToString();
+
+    context.Response.Headers["Access-Control-Allow-Origin"] = allowOrigin;
+    context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD";
+    context.Response.Headers["Access-Control-Allow-Headers"] =
+        string.IsNullOrWhiteSpace(requestedHeaders) ? defaultAllowHeaders : requestedHeaders;
+    context.Response.Headers["Access-Control-Expose-Headers"] = "*";
+    context.Response.Headers["Access-Control-Max-Age"] = "86400";
+    context.Response.Headers["Vary"] = "Origin";
+
+    if (allowOrigin == "*")
+    {
+        context.Response.Headers.Remove("Access-Control-Allow-Credentials");
+        return;
+    }
+
+    context.Response.Headers["Access-Control-Allow-Credentials"] = "true";
 }
