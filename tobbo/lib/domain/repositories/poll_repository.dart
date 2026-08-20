@@ -12,6 +12,8 @@ abstract class PollRepository {
 
   Future<Poll> getPoll(String publicCode);
 
+  Future<Poll> getResults(String publicCode);
+
   Future<PollVote> vote({
     required String publicCode,
     required String optionId,

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 abstract final class AppColors {
   AppColors._();
 
-  static const Color deepBrand = Color(0xFF464B71);
-  static const Color primary = Color(0xFF118AB2);
+  static const Color deepBrand = Color(0xFF033e42);
+  static const Color primary = Color(0xFF033e42);
   static const Color accent = Color(0xFF7CD5C7);
 
   static const Color lightBackground = Color(0xFFF2F2ED);

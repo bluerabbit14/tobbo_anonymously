@@ -4,6 +4,7 @@ import 'package:Tobbo/core/constants/app_radii.dart';
 import 'package:Tobbo/core/constants/app_spacing.dart';
 import 'package:Tobbo/core/router/app_routes.dart';
 import 'package:Tobbo/core/theme/tobbo_palette.dart';
+import 'package:Tobbo/core/utils/app_version.dart';
 import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/tobbo_button.dart';
 
@@ -115,7 +116,7 @@ class SettingScreen extends StatelessWidget {
                     Text('Data', style: Theme.of(context).textTheme.labelMedium),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Everything lives on this device. Clearing removes your questions and votes.',
+                      'Clearing this device starts a new anonymous identity. Previous questions and votes stay on the server but won’t be linked here.',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -129,9 +130,14 @@ class SettingScreen extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: AppSpacing.xxl),
-                    Text(
-                      'Tobbo · v1.0',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: palette.mutedText),
+                    FutureBuilder<String>(
+                      future: appVersionLabel(),
+                      builder: (context, snapshot) {
+                        return Text(
+                          snapshot.data ?? 'Tobbo',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: palette.mutedText),
+                        );
+                      },
                     ),
                   ],
                 ),

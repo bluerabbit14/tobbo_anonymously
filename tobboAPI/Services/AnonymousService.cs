@@ -34,6 +34,6 @@ public sealed class AnonymousService
         _db.AnonymousUsers.Add(user);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return new AnonymousTokenResponse(token, now.AddDays(_options.Value.TokenLifetimeDays));
+        return new AnonymousTokenResponse(token, now.AddDays(_options.Value.TokenLifetimeDays), user.Id);
     }
 }

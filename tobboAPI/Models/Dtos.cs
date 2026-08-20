@@ -3,7 +3,7 @@ using tobboAPI.Helpers;
 
 namespace tobboAPI.Models;
 
-public sealed record AnonymousTokenResponse(string AccessToken, DateTime ExpiresAt);
+public sealed record AnonymousTokenResponse(string AccessToken, DateTime ExpiresAt, Guid UserId);
 
 public sealed class CreatePollRequest
 {

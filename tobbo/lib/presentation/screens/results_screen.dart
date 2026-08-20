@@ -9,11 +9,18 @@ import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/empty_state.dart';
 import 'package:Tobbo/presentation/widgets/poll_controls.dart';
 import 'package:Tobbo/presentation/widgets/tobbo_button.dart';
+import 'package:Tobbo/presentation/widgets/tobbo_loader.dart';
 
-class ResultsScreen extends StatelessWidget {
+class ResultsScreen extends StatefulWidget {
   const ResultsScreen({super.key, required this.code});
 
   final String code;
+
+  @override
+  State<ResultsScreen> createState() => _ResultsScreenState();
+}
+
+class _ResultsScreenState extends State<ResultsScreen> {
 
   String _shareUrl(Poll poll) => 'https://tobbo.app/p/${poll.publicCode}';
 
@@ -63,10 +70,22 @@ class ResultsScreen extends StatelessWidget {
       animation: context.pollStore,
       builder: (context, _) {
         return FutureBuilder<Poll>(
-          future: context.pollStore.getPoll(code),
+          future: context.pollStore.getResults(widget.code),
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Scaffold(
+                body: SafeArea(
+                  child: EmptyState(
+                    title: 'Something went wrong.',
+                    message: snapshot.error.toString(),
+                    actionLabel: 'Try again',
+                    onAction: () => setState(() {}),
+                  ),
+                ),
+              );
+            }
             if (!snapshot.hasData) {
-              return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              return const Scaffold(body: Center(child: TobboLoader()));
             }
             final poll = snapshot.data!;
             return Scaffold(

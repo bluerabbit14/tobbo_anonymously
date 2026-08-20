@@ -7,6 +7,7 @@ import 'package:Tobbo/domain/entities/poll.dart';
 import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/empty_state.dart';
 import 'package:Tobbo/presentation/widgets/poll_card.dart';
+import 'package:Tobbo/presentation/widgets/tobbo_loader.dart';
 
 class ActivityScreen extends StatelessWidget {
   const ActivityScreen({super.key, this.initialTab = 0});
@@ -27,6 +28,23 @@ class ActivityScreen extends StatelessWidget {
               context.pollStore.getMyVotes(),
             ]),
             builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const Scaffold(
+                  body: SafeArea(child: Center(child: TobboLoader())),
+                );
+              }
+              if (snapshot.hasError) {
+                return Scaffold(
+                  body: SafeArea(
+                    child: EmptyState(
+                      title: 'Something went wrong.',
+                      message: snapshot.error.toString(),
+                      actionLabel: 'Ask Tobbo',
+                      onAction: () => context.push(AppRoutes.ask),
+                    ),
+                  ),
+                );
+              }
               final asked = snapshot.data?[0] ?? const <Poll>[];
               final voted = snapshot.data?[1] ?? const <Poll>[];
               return Scaffold(

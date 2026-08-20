@@ -8,6 +8,7 @@ import 'package:Tobbo/core/theme/tobbo_palette.dart';
 import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/empty_state.dart';
 import 'package:Tobbo/presentation/widgets/tobbo_button.dart';
+import 'package:Tobbo/presentation/widgets/tobbo_loader.dart';
 
 class CreatePollScreen extends StatefulWidget {
   const CreatePollScreen({super.key});
@@ -60,8 +61,8 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
       );
       if (!mounted) return;
       context.pushReplacement(AppRoutes.poll(poll.publicCode));
-    } catch (_) {
-      setState(() => _error = 'Something went wrong.');
+    } catch (error) {
+      setState(() => _error = error.toString());
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -71,10 +72,12 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
   Widget build(BuildContext context) {
     final palette = context.palette;
     return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xxl),
-          children: [
+      body: Stack(
+        children: [
+          SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xxl),
+              children: [
             ScreenHeader(title: 'Ask Tobbo', onBack: () => context.pop()),
             const SizedBox(height: AppSpacing.xl),
             Text(
@@ -160,7 +163,10 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
               ),
             ),
           ],
-        ),
+            ),
+          ),
+          if (_submitting) const TobboLoadingOverlay(),
+        ],
       ),
     );
   }

@@ -9,10 +9,16 @@ import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/empty_state.dart';
 import 'package:Tobbo/presentation/widgets/poll_card.dart';
 import 'package:Tobbo/presentation/widgets/tobbo_button.dart';
+import 'package:Tobbo/presentation/widgets/tobbo_loader.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   String _greeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) return 'Good morning.';
@@ -88,7 +94,19 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    if (items.isEmpty)
+                    if (snapshot.connectionState != ConnectionState.done)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(child: TobboLoader()),
+                      )
+                    else if (snapshot.hasError)
+                      EmptyState(
+                        title: "Couldn't load nearby questions.",
+                        message: snapshot.error.toString(),
+                        actionLabel: 'Try again',
+                        onAction: () => setState(() {}),
+                      )
+                    else if (items.isEmpty)
                       EmptyState(
                         title: 'Nothing nearby yet.',
                         message: 'Be the first to ask something.',

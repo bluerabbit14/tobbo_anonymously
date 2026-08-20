@@ -1,16 +1,25 @@
 import 'package:flutter/foundation.dart';
-import 'package:Tobbo/data/datasources/sample_poll_datasource.dart';
+import 'package:Tobbo/core/error/api_exception.dart';
+import 'package:Tobbo/data/services/api_service.dart';
+import 'package:Tobbo/data/services/location_service.dart';
 import 'package:Tobbo/domain/entities/poll.dart';
-import 'package:Tobbo/domain/entities/poll_option.dart';
 import 'package:Tobbo/domain/entities/poll_vote.dart';
 import 'package:Tobbo/domain/enums/poll_status.dart';
 import 'package:Tobbo/domain/repositories/poll_repository.dart';
+import 'package:Tobbo/domain/repositories/session_repository.dart';
 
 class PollRepositoryImpl extends ChangeNotifier implements PollRepository {
-  PollRepositoryImpl(this._source);
+  PollRepositoryImpl({
+    required ApiService api,
+    required LocationService location,
+    required SessionRepository sessions,
+  })  : _api = api,
+        _location = location,
+        _sessions = sessions;
 
-  final SamplePollDataSource _source;
-  int _createdCount = 0;
+  final ApiService _api;
+  final LocationService _location;
+  final SessionRepository _sessions;
 
   @override
   Future<Poll> createPoll({
@@ -18,47 +27,90 @@ class PollRepositoryImpl extends ChangeNotifier implements PollRepository {
     required List<String> options,
     required bool shareWithNearby,
   }) async {
-    _createdCount++;
-    final id = 'p-local-$_createdCount';
-    final poll = SamplePollRecord(
-      id: id,
-      publicCode: _codeFor(id),
+    await _sessions.ensureSession();
+    double? latitude;
+    double? longitude;
+    if (shareWithNearby) {
+      final point = await _location.getCurrentPosition();
+      if (point == null) {
+        throw const ApiException(
+          'Location is needed to share with people nearby.',
+          code: 'ALLOW_NEARBY_REQUIRES_LOCATION',
+        );
+      }
+      latitude = point.latitude;
+      longitude = point.longitude;
+    }
+
+    final created = await _api.createPoll(
       question: question.trim(),
-      createdByUserId: SamplePollDataSource.currentUserId,
-      createdAt: DateTime.now().toUtc(),
-      distanceKm: shareWithNearby ? 0.2 : null,
-      shareWithNearby: shareWithNearby,
-      options: [
-        for (var i = 0; i < options.length; i++)
-          SampleOptionRecord(
-            id: '$id-o${i + 1}',
-            text: options[i].trim(),
-            sortOrder: i + 1,
-            voteCount: 0,
-          ),
-      ],
+      options: options.map((option) => option.trim()).toList(),
+      allowNearby: shareWithNearby,
+      latitude: latitude,
+      longitude: longitude,
     );
-    _source.polls.insert(0, poll);
     notifyListeners();
-    return _toEntity(poll);
+    return Poll(
+      id: created.id,
+      publicCode: created.publicCode,
+      question: question.trim(),
+      options: const [],
+      createdAt: DateTime.now().toUtc(),
+      createdByUserId: '',
+      shareWithNearby: shareWithNearby,
+    );
   }
 
   @override
   Future<List<Poll>> getNearbyPolls({required double radiusKm}) async {
-    return _source.polls
-        .where((p) => p.shareWithNearby && p.distanceKm != null && p.distanceKm! <= radiusKm)
-        .map(_toEntity)
-        .toList()
-      ..sort((a, b) => (a.distanceKm ?? 0).compareTo(b.distanceKm ?? 0));
+    await _sessions.ensureSession();
+    final point = await _location.getCurrentPosition();
+    if (point == null) return const [];
+    final items = await _api.getNearbyPolls(
+      latitude: point.latitude,
+      longitude: point.longitude,
+      radiusKm: radiusKm,
+    );
+    return [for (final item in items) item.toEntity()];
   }
 
   @override
   Future<Poll> getPoll(String publicCode) async {
-    final poll = _source.findByCode(publicCode);
-    if (poll == null) {
-      throw StateError("We couldn't load this question.");
+    await _sessions.ensureSession();
+    final point = await _location.getIfPermitted();
+    final detail = await _api.getPoll(
+      publicCode: publicCode,
+      latitude: point?.latitude,
+      longitude: point?.longitude,
+    );
+    if (!detail.hasVoted && detail.status != PollStatus.expired) {
+      return detail.toEntity();
     }
-    return _toEntity(poll);
+
+    final results = await _api.getResults(publicCode);
+    String? votedText;
+    if (results.myVoteOptionId != null) {
+      for (final option in results.options) {
+        if (option.id == results.myVoteOptionId) {
+          votedText = option.text;
+          break;
+        }
+      }
+    }
+    return detail.toEntity(
+      voteCounts: {
+        for (final option in results.options) option.id: option.voteCount,
+      },
+      votedOptionId: results.myVoteOptionId,
+      votedOptionText: votedText,
+    );
+  }
+
+  @override
+  Future<Poll> getResults(String publicCode) async {
+    await _sessions.ensureSession();
+    final results = await _api.getResults(publicCode);
+    return results.toEntity(publicCode);
   }
 
   @override
@@ -66,106 +118,34 @@ class PollRepositoryImpl extends ChangeNotifier implements PollRepository {
     required String publicCode,
     required String optionId,
   }) async {
-    final poll = _source.findByCode(publicCode);
-    if (poll == null) {
-      throw StateError("We couldn't load this question.");
-    }
-    if (poll.status == PollStatus.expired) {
-      throw StateError('This question has closed.');
-    }
-    if (_voteFor(poll.id) != null) {
-      throw StateError("You've already voted.");
-    }
-    SampleOptionRecord? option;
-    for (final item in poll.options) {
-      if (item.id == optionId) option = item;
-    }
-    if (option == null) {
-      throw StateError("That option isn't available.");
-    }
-    option.voteCount++;
-    final vote = SampleVoteRecord(
-      pollId: poll.id,
-      optionId: optionId,
-      userId: SamplePollDataSource.currentUserId,
-      votedAt: DateTime.now().toUtc(),
-    );
-    _source.votes.add(vote);
+    await _sessions.ensureSession();
+    await _api.vote(publicCode: publicCode, optionId: optionId);
     notifyListeners();
     return PollVote(
-      pollId: vote.pollId,
-      optionId: vote.optionId,
-      userId: vote.userId,
-      votedAt: vote.votedAt,
+      pollId: publicCode,
+      optionId: optionId,
+      userId: '',
+      votedAt: DateTime.now().toUtc(),
     );
   }
 
   @override
   Future<List<Poll>> getMyPolls() async {
-    return _source.polls
-        .where((p) => p.createdByUserId == SamplePollDataSource.currentUserId)
-        .map(_toEntity)
-        .toList();
+    await _sessions.ensureSession();
+    final items = await _api.getMyPolls();
+    return [for (final item in items) item.toEntity()];
   }
 
   @override
   Future<List<Poll>> getMyVotes() async {
-    final mine = _source.votes.where((v) => v.userId == SamplePollDataSource.currentUserId);
-    return [
-      for (final vote in mine)
-        _toEntity(_source.polls.firstWhere((p) => p.id == vote.pollId)),
-    ];
+    await _sessions.ensureSession();
+    final items = await _api.getMyVotes();
+    return [for (final item in items) item.toEntity()];
   }
 
   @override
   Future<void> clearLocalData() async {
-    _source.reset();
-    _createdCount = 0;
+    await _sessions.clearSession();
     notifyListeners();
-  }
-
-  SampleVoteRecord? _voteFor(String pollId) {
-    for (final vote in _source.votes) {
-      if (vote.pollId == pollId && vote.userId == SamplePollDataSource.currentUserId) {
-        return vote;
-      }
-    }
-    return null;
-  }
-
-  Poll _toEntity(SamplePollRecord poll) {
-    final vote = _voteFor(poll.id);
-    String? votedText;
-    if (vote != null) {
-      votedText = poll.options.firstWhere((o) => o.id == vote.optionId).text;
-    }
-    return Poll(
-      id: poll.id,
-      publicCode: poll.publicCode,
-      question: poll.question,
-      options: [
-        for (final option in poll.options)
-          PollOption(
-            id: option.id,
-            text: option.text,
-            sortOrder: option.sortOrder,
-            voteCount: option.voteCount,
-          ),
-      ],
-      voteCount: poll.voteCount,
-      distanceKm: poll.distanceKm,
-      createdAt: poll.createdAt,
-      expiresAt: poll.expiresAt,
-      status: poll.status,
-      createdByUserId: poll.createdByUserId,
-      shareWithNearby: poll.shareWithNearby,
-      hasVoted: vote != null,
-      votedOptionId: vote?.optionId,
-      votedOptionText: votedText,
-    );
-  }
-
-  String _codeFor(String id) {
-    return id.replaceAll(RegExp(r'[^A-Za-z0-9]'), '').toUpperCase().padRight(6, 'X').substring(0, 6);
   }
 }

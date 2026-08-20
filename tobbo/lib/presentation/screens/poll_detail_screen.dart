@@ -7,6 +7,7 @@ import 'package:Tobbo/presentation/app_scope.dart';
 import 'package:Tobbo/presentation/widgets/empty_state.dart';
 import 'package:Tobbo/presentation/widgets/poll_controls.dart';
 import 'package:Tobbo/presentation/widgets/tobbo_button.dart';
+import 'package:Tobbo/presentation/widgets/tobbo_loader.dart';
 
 class PollDetailScreen extends StatefulWidget {
   const PollDetailScreen({super.key, required this.code, this.shared = false});
@@ -53,7 +54,7 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
                 body: SafeArea(
                   child: EmptyState(
                     title: 'Something went wrong.',
-                    message: "We couldn't load this question.",
+                    message: snapshot.error.toString(),
                     actionLabel: 'Try again',
                     onAction: () => setState(() {}),
                   ),
@@ -61,12 +62,14 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
               );
             }
             if (!snapshot.hasData) {
-              return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              return const Scaffold(body: Center(child: TobboLoader()));
             }
             final poll = snapshot.data!;
             return Scaffold(
-              body: SafeArea(
-                child: ListView(
+              body: Stack(
+                children: [
+                  SafeArea(
+                    child: ListView(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.pagePadding,
                     AppSpacing.sm,
@@ -156,6 +159,9 @@ class _PollDetailScreenState extends State<PollDetailScreen> {
                     ],
                   ],
                 ),
+              ),
+                  if (_voting) const TobboLoadingOverlay(),
+                ],
               ),
             );
           },

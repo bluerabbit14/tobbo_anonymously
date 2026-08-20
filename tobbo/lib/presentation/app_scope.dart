@@ -43,4 +43,6 @@ extension RepositoryScopeX on BuildContext {
   PollRepositoryImpl get pollStore => repos.polls as PollRepositoryImpl;
 
   SettingsRepositoryImpl get settingsStore => repos.settings as SettingsRepositoryImpl;
+
+  SessionRepository get sessionStore => repos.sessions;
 }

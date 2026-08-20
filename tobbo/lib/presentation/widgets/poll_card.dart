@@ -39,15 +39,17 @@ class PollCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(poll.question, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: AppSpacing.md),
-              for (final option in poll.options)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(
-                    '·  ${option.text}',
-                    style: Theme.of(context).textTheme.bodyMedium,
+              if (poll.options.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.md),
+                for (final option in poll.options)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      '·  ${option.text}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
-                ),
+              ],
               const SizedBox(height: AppSpacing.sm),
               Text(meta, style: Theme.of(context).textTheme.bodySmall),
             ],
