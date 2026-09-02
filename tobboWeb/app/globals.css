@@ -238,6 +238,14 @@ h3,
   opacity: 0.94;
 }
 
+.btn-try {
+  gap: 10px;
+}
+
+.btn-try svg {
+  flex-shrink: 0;
+}
+
 .option {
   display: flex;
   align-items: center;
@@ -282,6 +290,13 @@ h3,
 
 .result {
   margin-bottom: 16px;
+}
+
+.result.is-marked {
+  padding: 16px;
+  border: 1.4px solid var(--brand);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface));
 }
 
 .result-top {

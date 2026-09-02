@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { TryTobboButton } from "@/components/TryTobboButton";
 
 export default function HomePage() {
   return (
@@ -18,9 +19,7 @@ export default function HomePage() {
           <p className="home-tag">Ask. Vote. Decide.</p>
         </div>
         <div>
-          <a className="btn btn-cream" href="/app-debug.apk" download="tobbo.apk">
-            Download Android APK
-          </a>
+          <TryTobboButton className="btn btn-cream" />
           <p className="home-foot">Your identity stays private.</p>
         </div>
       </main>

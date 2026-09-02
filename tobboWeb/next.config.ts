@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/app-debug.apk",
+        source: "/app-release.apk",
         headers: [
           {
             key: "Content-Type",
@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Disposition",
             value: 'attachment; filename="tobbo.apk"',
+          },
+          {
+            key: "Cache-Control",
+            value: "no-store",
           },
         ],
       },

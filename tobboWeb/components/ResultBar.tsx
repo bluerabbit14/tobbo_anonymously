@@ -11,9 +11,9 @@ export function ResultBar({ text, voteCount, percentage, marked = false }: Resul
   const rounded = Math.round(percentage);
   const width = `${Math.max(0, Math.min(percentage, 100))}%`;
   return (
-    <div className="result">
+    <div className={marked ? "result is-marked" : "result"} aria-current={marked || undefined}>
       <div className="result-top">
-        <p className="result-label">{marked ? `${text}  Your vote` : text}</p>
+        <p className="result-label">{text}</p>
         <p className="result-pct">{rounded}%</p>
       </div>
       <div className="result-track">

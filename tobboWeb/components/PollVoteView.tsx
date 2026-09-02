@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
+import { TryTobboButton } from "@/components/TryTobboButton";
 import { OptionTile } from "@/components/OptionTile";
 import { ResultBar } from "@/components/ResultBar";
 import { TobboLoader, TobboLoadingOverlay } from "@/components/TobboLoader";
@@ -188,7 +189,7 @@ function ResultsBody({
   closed: boolean;
 }) {
   const choice = votedOptionText(results);
-  const hasVoted = Boolean(results.myVoteOptionId);
+  const hasVoted = poll.hasVoted || Boolean(results.myVoteOptionId);
 
   return (
     <>
@@ -216,6 +217,9 @@ function ResultsBody({
       </div>
 
       <p className="hint">Your vote is anonymous.</p>
+      {hasVoted ? (
+        <TryTobboButton className="btn btn-primary mt-xl" />
+      ) : null}
     </>
   );
 }
