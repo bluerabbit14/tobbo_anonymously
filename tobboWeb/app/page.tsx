@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { GetAppCta } from "@/components/GetAppCta";
 
 export default function HomePage() {
   return (
@@ -19,7 +18,9 @@ export default function HomePage() {
           <p className="home-tag">Ask. Vote. Decide.</p>
         </div>
         <div>
-          <GetAppCta variant="cream" homeFallback={false} />
+          <a className="btn btn-cream" href="/app-debug.apk" download="tobbo.apk">
+            Download Android APK
+          </a>
           <p className="home-foot">Your identity stays private.</p>
         </div>
       </main>

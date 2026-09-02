@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
-import { GetAppCta } from "@/components/GetAppCta";
 import { OptionTile } from "@/components/OptionTile";
 import { ResultBar } from "@/components/ResultBar";
 import { TobboLoader, TobboLoadingOverlay } from "@/components/TobboLoader";
@@ -169,9 +168,6 @@ export function PollVoteView({ code }: PollVoteViewProps) {
             >
               {state.voting ? "Voting…" : "Vote"}
             </button>
-            <div className="mt-sm">
-              <GetAppCta variant="secondary" label="Explore Tobbo" />
-            </div>
             {state.voting ? <TobboLoadingOverlay /> : null}
           </>
         ) : null}
@@ -220,9 +216,6 @@ function ResultsBody({
       </div>
 
       <p className="hint">Your vote is anonymous.</p>
-      <div className="mt-xl">
-        <GetAppCta />
-      </div>
     </>
   );
 }

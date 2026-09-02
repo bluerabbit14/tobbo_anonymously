@@ -4,7 +4,7 @@ Public web app for shared Tobbo polls. Opening `https://tobbo.app/p/{code}` lets
 
 ## Pages
 
-- `/` — branded landing with a Get Tobbo CTA
+- `/` — branded landing
 - `/p/{code}` — load the poll, vote once, then see results
 
 Identity is created with `POST /api/v1/anonymous` and stored in `localStorage`, matching the mobile app.
@@ -26,7 +26,3 @@ Open [http://localhost:3000/p/YOURCODE](http://localhost:3000/p/YOURCODE).
 |---|---|---|
 | `NEXT_PUBLIC_API_BASE_URL` | `https://tobbo-anonymously.onrender.com` | Tobbo API |
 | `NEXT_PUBLIC_SITE_URL` | `https://tobbo.app` | Canonical URL for Open Graph tags |
-| `NEXT_PUBLIC_PLAY_STORE_URL` | empty | Google Play CTA |
-| `NEXT_PUBLIC_APP_STORE_URL` | empty | App Store CTA |
-
-If store URLs are unset, Get Tobbo links back to `/`.

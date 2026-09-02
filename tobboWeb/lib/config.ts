@@ -26,6 +26,3 @@ export const SITE_URL = envUrl(
   process.env.NEXT_PUBLIC_SITE_URL,
   vercelSiteUrl() ?? "https://tobbo.app"
 );
-
-export const PLAY_STORE_URL = process.env.NEXT_PUBLIC_PLAY_STORE_URL?.trim() || "";
-export const APP_STORE_URL = process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() || "";
